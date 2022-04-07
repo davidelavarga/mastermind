@@ -4,6 +4,7 @@ from typing import Dict, Set
 from mastermind.domain.models.exceptions import ColorNotSupportedError
 
 
+# TODO inherit from UserDict
 @dataclass(frozen=True)
 class Code:
     pegs: Dict[str, Set[int]]
