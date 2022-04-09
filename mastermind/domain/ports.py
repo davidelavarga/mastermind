@@ -8,6 +8,11 @@ class DataStorage(ABC):
         pass
 
     @abstractmethod
+    def get_secret_code(self, game_id: int):
+        """Get the secret code of the given game id"""
+        pass
+
+    @abstractmethod
     def get_status(self, game_id: int):
         """Get the current status of the given game"""
         pass

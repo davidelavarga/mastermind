@@ -54,6 +54,11 @@ class SQLStorage(DataStorage):
         logging.info("Game code stored in database")
         return game_id
 
+    def get_secret_code(self, game_id: int):
+        """Get the secret code of the given game id"""
+        game = self._get_game(game_id)
+        return game.code
+
     def get_status(self, game_id: int) -> GameStatus:
         """Get the current status of the given game"""
         game = self._get_game(game_id)
