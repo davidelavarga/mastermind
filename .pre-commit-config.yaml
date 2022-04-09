@@ -20,11 +20,11 @@ repos:
     - id: check-added-large-files
     - id: requirements-txt-fixer
 
--   repo: git://github.com/Lucas-C/pre-commit-hooks-safety
-    rev: v1.2.2
-    hooks:
-    - id: python-safety-dependencies-check
-      files: requirements.txt
+# -   repo: git://github.com/Lucas-C/pre-commit-hooks-safety
+#     rev: v1.2.2
+#     hooks:
+#     - id: python-safety-dependencies-check
+#       files: requirements.txt
 -   repo: https://github.com/asottile/pyupgrade
     rev: v2.31.0
     hooks:
