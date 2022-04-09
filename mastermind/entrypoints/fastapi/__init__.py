@@ -9,7 +9,13 @@ from fastapi.security import APIKeyHeader
 
 from mastermind.bootstrap import configure_inject
 from mastermind.domain.actions.create_game import GameCreator
-from mastermind.entrypoints.fastapi.models import NewGameRequest, NewGameResponse
+from mastermind.domain.actions.game_status import GameStatusManager
+from mastermind.domain.models.exceptions import GameNotFound
+from mastermind.entrypoints.fastapi.models import (
+    GameStatusResponse,
+    NewGameRequest,
+    NewGameResponse,
+)
 
 app = FastAPI(root_path=os.getenv("ROOT_PATH", ""))
 
@@ -43,6 +49,17 @@ async def exception_handler(request: Request, exc: Exception):
     )
 
 
+@app.exception_handler(GameNotFound)
+async def game_not_found_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=HTTPStatus.BAD_REQUEST.value,
+        content={
+            "status": f"{HTTPStatus.BAD_REQUEST.name}",
+            "ErrorMessage": f"{exc}",
+        },
+    )
+
+
 @app.post(
     "/games",
     response_model=NewGameResponse,
@@ -54,3 +71,21 @@ async def create_game(
 ):
     game_id, supported_colors = GameCreator()(request.code_len)
     return NewGameResponse(**{"gameId": game_id, "supportedColors": supported_colors})
+
+
+@app.get(
+    "/games/{id}/status",
+    response_model=GameStatusResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get status of the game",
+)
+async def game_status(game_id: int, api_key: APIKey = Depends(verify_api_key)):
+    status = GameStatusManager()(game_id)
+    return GameStatusResponse(
+        **{
+            "gameId": game_id,
+            "isSolved": status.solved,
+            "lastGuess": status.guess_code,
+            "pegs": {"black": status.black_pegs, "white": status.white_pegs},
+        }
+    )
