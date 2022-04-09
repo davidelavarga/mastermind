@@ -1,6 +1,18 @@
-class ColorNotSupportedError(Exception):
+class InputException(Exception):
     pass
 
 
-class GameNotFound(Exception):
+class ColorNotSupportedError(InputException):
+    pass
+
+
+class GameNotFound(InputException):
+    pass
+
+
+class BadGuessLength(InputException):
+    pass
+
+
+class GameAlreadySolvedError(InputException):
     pass
