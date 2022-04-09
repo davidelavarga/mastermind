@@ -1,3 +1,5 @@
+supported_colors: "RBYGWO"
+
 data_storage:
   sql:
     db_name: mastermind
