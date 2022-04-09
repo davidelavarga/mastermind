@@ -3,9 +3,13 @@ import sys
 
 import inject
 
+from mastermind.domain.ports import DataStorage
+
 
 def dev_config(binder):
-    pass
+    from mastermind.adapters.data_storage.sql import SQLStorage
+
+    binder.bind(DataStorage, SQLStorage())
 
 
 def configure_inject():
