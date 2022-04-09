@@ -10,9 +10,11 @@ from fastapi.security import APIKeyHeader
 from mastermind.bootstrap import configure_inject
 from mastermind.domain.actions.create_game import GameCreator
 from mastermind.domain.actions.game_status import GameStatusManager
-from mastermind.domain.models.exceptions import GameNotFound
+from mastermind.domain.actions.guess import GuessManager
+from mastermind.domain.models.exceptions import InputException
 from mastermind.entrypoints.fastapi.models import (
     GameStatusResponse,
+    GuessRequest,
     NewGameRequest,
     NewGameResponse,
 )
@@ -49,8 +51,8 @@ async def exception_handler(request: Request, exc: Exception):
     )
 
 
-@app.exception_handler(GameNotFound)
-async def game_not_found_exception_handler(request: Request, exc: Exception):
+@app.exception_handler(InputException)
+async def color_not_supported_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=HTTPStatus.BAD_REQUEST.value,
         content={
@@ -74,18 +76,38 @@ async def create_game(
 
 
 @app.get(
-    "/games/{id}/status",
+    "/games/{game_id}/status",
     response_model=GameStatusResponse,
     status_code=status.HTTP_200_OK,
     summary="Get status of the game",
 )
 async def game_status(game_id: int, api_key: APIKey = Depends(verify_api_key)):
-    status = GameStatusManager()(game_id)
+    game_status = GameStatusManager()(game_id)
     return GameStatusResponse(
         **{
             "gameId": game_id,
-            "isSolved": status.solved,
-            "lastGuess": status.guess_code,
-            "pegs": {"black": status.black_pegs, "white": status.white_pegs},
+            "isSolved": game_status.solved,
+            "lastGuess": game_status.guess_code,
+            "pegs": {"black": game_status.black_pegs, "white": game_status.white_pegs},
+        }
+    )
+
+
+@app.post(
+    "/games/{game_id}/guess",
+    response_model=GameStatusResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Make a guess and get black and white pegs",
+)
+async def guess(
+    game_id: int, request: GuessRequest, api_key: APIKey = Depends(verify_api_key)
+):
+    game_status = GuessManager()(game_id, request.guess)
+    return GameStatusResponse(
+        **{
+            "gameId": game_id,
+            "isSolved": game_status.solved,
+            "lastGuess": game_status.guess_code,
+            "pegs": {"black": game_status.black_pegs, "white": game_status.white_pegs},
         }
     )

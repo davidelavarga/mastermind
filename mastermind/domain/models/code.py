@@ -27,7 +27,9 @@ class CodeBuilder:
     def _check_colors(self):
         for c in self.code:
             if c not in self.supported_colors:
-                raise ColorNotSupportedError()
+                raise ColorNotSupportedError(
+                    f"{c} is not in supported colors ({self.supported_colors})"
+                )
 
     def _find(self, code, ch):
         return {i for i, ltr in enumerate(code) if ltr == ch}

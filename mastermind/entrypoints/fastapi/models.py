@@ -1,5 +1,3 @@
-from typing import Dict, List, Optional
-
 from pydantic import BaseModel, Field
 
 
@@ -22,3 +20,7 @@ class GameStatusResponse(BaseModel):
     is_solved: bool = Field(alias="isSolved")
     last_guess: str = Field(alias="lastGuess")
     pegs: Pegs
+
+
+class GuessRequest(BaseModel):
+    guess: str

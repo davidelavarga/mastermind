@@ -18,7 +18,7 @@ class DataStorage(ABC):
         pass
 
     @abstractmethod
-    def store_guess(self, guess: str, black_pegs: int, white_pegs: int):
+    def store_guess(self, game_id: int, guess: str, black_pegs: int, white_pegs: int):
         """Store the given guess for the given game"""
         pass
 
