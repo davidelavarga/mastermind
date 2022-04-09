@@ -66,12 +66,7 @@ class SQLStorage(DataStorage):
                 white_pegs=last_guess.white_pegs,
                 guess_code=last_guess.guess,
             )
-        return GameStatus(
-            solved=game.solved,
-            black_pegs=None,
-            white_pegs=None,
-            guess_code=None,
-        )
+        return GameStatus(solved=game.solved)
 
     def store_guess(self, game_id: int, guess: str, black_pegs: int, white_pegs: int):
         """Store the given guess for the given game"""
