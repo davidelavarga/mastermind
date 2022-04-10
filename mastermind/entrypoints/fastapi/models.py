@@ -24,3 +24,8 @@ class GameStatusResponse(BaseModel):
 
 class GuessRequest(BaseModel):
     guess: str
+
+
+class GameSurrenderedResponse(BaseModel):
+    game_id: int = Field(alias="gameId")
+    secret_code: str = Field(alias="secretCode")
