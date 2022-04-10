@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+from typing import List
 
+from mastermind.domain.models.guess import Guess
 from mastermind.domain.models.status import GameStatus
 
 
@@ -27,6 +29,11 @@ class DataStorage(ABC):
         pass
 
     @abstractmethod
+    def get_guesses(self, game_id: int) -> List[Guess]:
+        """Get all guesses for the given game"""
+        pass
+
+    @abstractmethod
     def is_game_solved(self, game_id: int) -> bool:
         """True if given game solved, False otherwise"""
         pass
@@ -34,4 +41,9 @@ class DataStorage(ABC):
     @abstractmethod
     def resolve_game(self, game_id: int):
         """Resolve the game"""
+        pass
+
+    @abstractmethod
+    def surrender(self, game_id: int):
+        """Set the game as finished and return the secret code"""
         pass
