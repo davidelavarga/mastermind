@@ -30,3 +30,8 @@ class GuessResponse(BaseModel):
     guess_id: str = Field(alias="guessId")
     guess_code: str = Field(alias="guessCode")
     pegs: Pegs
+
+
+class GameSurrenderedResponse(BaseModel):
+    game_id: int = Field(alias="gameId")
+    secret_code: str = Field(alias="secretCode")
