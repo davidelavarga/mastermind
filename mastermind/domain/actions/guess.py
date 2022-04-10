@@ -1,10 +1,12 @@
 import logging
+from typing import List
 
 import inject
 
 from mastermind.domain.models.black_pegs import BlackPegs
 from mastermind.domain.models.code import CodeBuilder
 from mastermind.domain.models.exceptions import BadGuessLength, GameAlreadySolvedError
+from mastermind.domain.models.guess import Guess
 from mastermind.domain.models.status import GameStatus
 from mastermind.domain.models.white_pegs import WhitePegs
 from mastermind.domain.ports import DataStorage
@@ -53,6 +55,9 @@ class GuessManager:
             white_pegs=white_pegs,
             guess_code=guess.raw,
         )
+
+    def get_guesses(self, game_id: int) -> List[Guess]:
+        return self.data_storage.get_guesses(game_id)
 
     def _check_solved_code(self, game_id: int):
         if self.data_storage.is_game_solved(game_id):

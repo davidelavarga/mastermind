@@ -1,6 +1,7 @@
 import logging
 import os
 from http import HTTPStatus
+from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Security, status
 from fastapi.openapi.models import APIKey
@@ -15,6 +16,7 @@ from mastermind.domain.models.exceptions import InputException
 from mastermind.entrypoints.fastapi.models import (
     GameStatusResponse,
     GuessRequest,
+    GuessResponse,
     NewGameRequest,
     NewGameResponse,
 )
@@ -94,7 +96,7 @@ async def game_status(game_id: int, api_key: APIKey = Depends(verify_api_key)):
 
 
 @app.post(
-    "/games/{game_id}/guess",
+    "/games/{game_id}/guesses",
     response_model=GameStatusResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Make a guess and get black and white pegs",
@@ -111,3 +113,23 @@ async def guess(
             "pegs": {"black": game_status.black_pegs, "white": game_status.white_pegs},
         }
     )
+
+
+@app.get(
+    "/games/{game_id}/guesses",
+    response_model=List[GuessResponse],
+    status_code=status.HTTP_201_CREATED,
+    summary="Make a guess and get black and white pegs",
+)
+async def get_guess(game_id: int, api_key: APIKey = Depends(verify_api_key)):
+    guesses = GuessManager().get_guesses(game_id)
+    return [
+        GuessResponse(
+            **{
+                "guessId": g.id,
+                "guessCode": g.code,
+                "pegs": {"black": g.black_pegs, "white": g.white_pegs},
+            }
+        )
+        for g in guesses
+    ]

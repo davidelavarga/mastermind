@@ -11,6 +11,7 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy_utils import create_database, database_exists
 
 from mastermind.domain.models.exceptions import GameNotFound
+from mastermind.domain.models.guess import Guess
 from mastermind.domain.models.status import GameStatus
 from mastermind.domain.ports import DataStorage
 from mastermind.utils.config_loader import get_config
@@ -62,7 +63,7 @@ class SQLStorage(DataStorage):
     def get_status(self, game_id: int) -> GameStatus:
         """Get the current status of the given game"""
         game = self._get_game(game_id)
-        last_guess = self._get_guess(game_id)
+        last_guess = self._get_last_guess(game_id)
 
         if last_guess:
             return GameStatus(
@@ -104,6 +105,19 @@ class SQLStorage(DataStorage):
                 logging.exception(e)
                 session.rollback()
 
+    def get_guesses(self, game_id: int) -> int:
+        """Get all guesses for the given game"""
+        logging.info(f"Getting last guess for {game_id} from db ...")
+        with Session(bind=self._engine) as session:
+            guesses = session.query(Guesses).filter(Guesses.code_id == game_id).all()
+
+        return [
+            Guess(
+                id=g.id, code=g.guess, black_pegs=g.black_pegs, white_pegs=g.white_pegs
+            )
+            for g in guesses
+        ]
+
     def _get_database_conn_str(self):
         db_conn_str = os.environ["DB_CONN_STR"]
         db_name = self._config["db_name"]
@@ -134,7 +148,7 @@ class SQLStorage(DataStorage):
             raise GameNotFound(f"Game {game_id} not found")
         return game
 
-    def _get_guess(self, game_id: int):
+    def _get_last_guess(self, game_id: int):
         logging.info(f"Getting last guess for {game_id} from db ...")
         with Session(bind=self._engine) as session:
             max_id = session.query(func.max(Guesses.id))
