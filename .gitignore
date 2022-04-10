@@ -1,0 +1,6 @@
+.vscode
+.idea
+pip.conf
+__pycache__
+venv
+tmp
