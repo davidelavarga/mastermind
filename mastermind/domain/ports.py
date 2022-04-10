@@ -35,3 +35,8 @@ class DataStorage(ABC):
     def resolve_game(self, game_id: int):
         """Resolve the game"""
         pass
+
+    @abstractmethod
+    def surrender(self, game_id: int):
+        """Set the game as finished and return the secret code"""
+        pass

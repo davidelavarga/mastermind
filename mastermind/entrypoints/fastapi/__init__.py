@@ -11,9 +11,11 @@ from mastermind.bootstrap import configure_inject
 from mastermind.domain.actions.create_game import GameCreator
 from mastermind.domain.actions.game_status import GameStatusManager
 from mastermind.domain.actions.guess import GuessManager
+from mastermind.domain.actions.surrender import Surrender
 from mastermind.domain.models.exceptions import InputException
 from mastermind.entrypoints.fastapi.models import (
     GameStatusResponse,
+    GameSurrenderedResponse,
     GuessRequest,
     NewGameRequest,
     NewGameResponse,
@@ -111,3 +113,14 @@ async def guess(
             "pegs": {"black": game_status.black_pegs, "white": game_status.white_pegs},
         }
     )
+
+
+@app.post(
+    "/games/{game_id}/surrender",
+    response_model=GameSurrenderedResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Set the game as surrendered and get the secret code",
+)
+async def surrender(game_id: int, api_key: APIKey = Depends(verify_api_key)):
+    secret_code = Surrender()(game_id)
+    return GameSurrenderedResponse(**{"gameId": game_id, "secretCode": secret_code})

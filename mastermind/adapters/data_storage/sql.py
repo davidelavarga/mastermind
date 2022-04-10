@@ -25,6 +25,7 @@ class Codes(Base):
     code = Column(String)
     date = Column(DateTime)
     solved = Column(Boolean)
+    surrendered = Column(Boolean)
     guesses = relationship("Guesses")
 
 
@@ -49,7 +50,7 @@ class SQLStorage(DataStorage):
 
     def initialize_game(self, code: str) -> int:
         """Store a new game code"""
-        game = Codes(code=code, date=datetime.now(), solved=False)
+        game = Codes(code=code, date=datetime.now(), solved=False, surrendered=False)
         game_id = self._insert(game)
         logging.info("Game code stored in database")
         return game_id
@@ -97,6 +98,18 @@ class SQLStorage(DataStorage):
         with Session(bind=self._engine) as session:
             session.query(Codes).filter(Codes.id == game_id).update(
                 {Codes.solved: True}
+            )
+            try:
+                session.commit()
+            except SQLAlchemyError as e:
+                logging.exception(e)
+                session.rollback()
+
+    def surrender(self, game_id: int):
+        """Set the game as finished and return the secret code"""
+        with Session(bind=self._engine) as session:
+            session.query(Codes).filter(Codes.id == game_id).update(
+                {Codes.surrendered: True}
             )
             try:
                 session.commit()
