@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+from typing import List
 
+from mastermind.domain.models.guess import Guess
 from mastermind.domain.models.status import GameStatus
 
 
@@ -24,6 +26,11 @@ class DataStorage(ABC):
         self, game_id: int, guess: str, black_pegs: int, white_pegs: int
     ) -> int:
         """Store the given guess for the given game"""
+        pass
+
+    @abstractmethod
+    def get_guesses(self, game_id: int) -> List[Guess]:
+        """Get all guesses for the given game"""
         pass
 
     @abstractmethod
