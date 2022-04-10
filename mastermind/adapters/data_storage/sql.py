@@ -47,14 +47,14 @@ class SQLStorage(DataStorage):
         self._create_database()
         self._create_tables()
 
-    def initialize_game(self, code: str):
+    def initialize_game(self, code: str) -> int:
         """Store a new game code"""
         game = Codes(code=code, date=datetime.now(), solved=False)
         game_id = self._insert(game)
         logging.info("Game code stored in database")
         return game_id
 
-    def get_secret_code(self, game_id: int):
+    def get_secret_code(self, game_id: int) -> str:
         """Get the secret code of the given game id"""
         game = self._get_game(game_id)
         return game.code
@@ -73,7 +73,9 @@ class SQLStorage(DataStorage):
             )
         return GameStatus(solved=game.solved)
 
-    def store_guess(self, game_id: int, guess: str, black_pegs: int, white_pegs: int):
+    def store_guess(
+        self, game_id: int, guess: str, black_pegs: int, white_pegs: int
+    ) -> int:
         """Store the given guess for the given game"""
         guess_id = self._insert(
             Guesses(
@@ -86,7 +88,7 @@ class SQLStorage(DataStorage):
         logging.info(f"Guess {guess_id} for code {game_id} stored in database")
         return guess_id
 
-    def is_game_solved(self, game_id: int):
+    def is_game_solved(self, game_id: int) -> bool:
         """True if given game solved, False otherwise"""
         return self._get_game(game_id).solved
 

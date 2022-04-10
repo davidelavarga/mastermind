@@ -1,5 +1,5 @@
 TAG := $(shell git describe --tags --abbrev=0)
-IMAGE_NAME := inari-mastermind
+IMAGE_NAME := mastermind
 
 build:
 	docker build -t $(IMAGE_NAME) .
